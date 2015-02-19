@@ -4,7 +4,7 @@
 # imports
 
 from Tkinter import *
-from GameEngine import Game
+from sokoban_engine import Game
 from sys import argv
 
 # initialize
@@ -48,17 +48,17 @@ def key(event):
 
     # valid keys if still in game
     if not g.victory():
-        if press == 'Up':
+        if press in ('Up','k'):
             g.move((0, -1))
-        elif press == 'Down':
+        elif press in ('Down', 'j'):
             g.move((0, 1))
-        elif press == 'Left':
+        elif press in ('Left', 'h'):
             g.move((-1, 0))
-        elif press == 'Right':
+        elif press in ('Right', 'l'):
             g.move((1, 0))
 
     # if exit
-    if press == 'Escape':
+    if press in ('Escape', 'q'):
         root.quit()
 
     # update GUI

@@ -106,12 +106,12 @@ class Game(object):
                 row += 1
             if not obj.hidden:
                 output += obj.show()
-            if (x, y) == self.player.coords and type(obj) is Storage:
+            if (x, y) == self.player.coords and isinstance(obj, Storage):
                 output += self.player.showInStorage()
             elif (x, y) == self.player.coords:
                 output += self.player.show()
             if (x, y) in self.crates:
-                if type(obj) is Storage:
+                if isinstance(obj, Storage):
                     output += self.crates[(x, y)].showInStorage()
                 else:
                     output += self.crates[(x, y)].show()
@@ -175,7 +175,7 @@ class Game(object):
                 else:
                     if updateCrates and coords == crateNewCoords:
                         obj.hide(True)
-                        if type(obj) is Storage:
+                        if isinstance(obj, Storage):
                             self.crates[crateNewCoords].inStorage = True
 
             # check to see if all crates are in storage

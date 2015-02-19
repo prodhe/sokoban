@@ -71,8 +71,6 @@ def key(event):
             g.init(level)
             w.itemconfig(screen, text=g.output())
 
-
-
 # listen for key presses
 root.bind("<Key>", key)
 

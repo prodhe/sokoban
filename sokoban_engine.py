@@ -57,17 +57,19 @@ class Floor(GameObject):
 class Game(object):
 
     def __init__(self):
-        self.board = []
-        self.player = Player()
-        self.crates = {}
-        self.levelFinished = False
+        pass
 
     def init(self, s):
+        """Read a level 's' and initialize the game."""
+
+        # Initialize objects and default values
         self.board = []
         self.player = Player()
         self.crates = {}
         self.levelFinished = False
 
+        # Manually track (x,y)-coords and loop through each character
+        # and create game objects accordingly
         x = 0
         y = 0
         for c in s:

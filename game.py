@@ -13,6 +13,11 @@ def restart():
     g.init()
     w.itemconfig(screen, text=g.output())
 
+# restart
+def undo():
+    g.undo()
+    w.itemconfig(screen, text=g.output())
+
 # open new level
 def openfile():
     filename = askopenfilename(parent=root)
@@ -36,6 +41,8 @@ def key(event):
             g.move((-1, 0))
         elif press in ('Right', 'l'):
             g.move((1, 0))
+        elif press in ('U', 'u'):
+            g.undo()
 
     # if exit
     if press in ('Escape', 'q'):
@@ -79,6 +86,7 @@ root = Tk()
 
 menubar = Menu(root)
 filemenu = Menu(menubar, tearoff=0)
+filemenu.add_command(label="Undo", command=undo)
 filemenu.add_command(label="Restart", command=restart)
 filemenu.add_separator()
 filemenu.add_command(label="Open", command=openfile)

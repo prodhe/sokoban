@@ -66,7 +66,6 @@ class Game(object):
         self.player = Player()
         self.crates = {}
         self.levelFinished = False
-        self.numberOfMoves = 0
         self.moveHistory = []
 
         # Manually track (x,y)-coords and loop through each character
@@ -106,7 +105,7 @@ class Game(object):
     def output(self):
         """Return a string representation of the board"""
         if self.levelFinished:
-            return "Congratulations!\n\nYou finished in %d moves." % self.numberOfMoves
+            return "Congratulations!\n\nYou finished in %d moves." % len(self.moveHistory)
 
         # create and return a string representation of the board
         row = 0
@@ -129,11 +128,10 @@ class Game(object):
 
         return output
 
-    def move(self, direction):
+    def move(self, direction, saveHistory = True):
         # unpack the direction tuple
         try:
             dirX, dirY = direction
-            self.moveHistory.append(direction)
         except:
             return None
 
@@ -174,10 +172,11 @@ class Game(object):
                     movePlayer = False
                     updateCrates = False
 
-            # move player
+            # move player and perhaps history
             if movePlayer:
                 self.player.coords = newCoords
-                self.numberOfMoves += 1
+                if saveHistory:
+                    self.moveHistory.append(direction)
 
             # loop and update all floors and storages
             for coords, obj in self.board:
@@ -191,7 +190,7 @@ class Game(object):
                         if isinstance(obj, Storage):
                             self.crates[crateNewCoords].inStorage = True
 
-            # check to see if all crates are in storage
+            # check to see if all crates are in storage, ie victory
             if updateCrates:
                 for coords, crate in self.crates.items():
                     if not crate.inStorage:
@@ -202,6 +201,11 @@ class Game(object):
 
         else:
             pass #invalid move
+
+    def undo(self):
+        if self.moveHistory:
+            oldX, oldY = self.moveHistory.pop()
+            self.move((oldX * -1, oldY * -1), saveHistory = False)
 
     def lookahead(self, newCoords):
         isValidMove = True

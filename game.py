@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# do some newstuff
+
 # imports
 
 from Tkinter import *

@@ -7,38 +7,10 @@ from Tkinter import *
 from sokoban_engine import Game
 from sys import argv
 
-# initialize
-
-g = Game()
-defaultLevel = """
- #######
-#       #
-#       #
-# @ o . #
-#       #
-#       #
- #######
-"""
-
-if len(argv) == 2:
-    try:
-        with open(argv[1]) as f:
-            level = f.read()
-    except:
-        level = defaultLevel
-else:
-    level = defaultLevel
-
-g.init(level)
-
-# game loop and GUI
-
-root = Tk()
-root.title("Sokoban")
-
-w = Canvas(root, background="#222", width=600, height=500)
-w.pack()
-screen = w.create_text(300,250, anchor=CENTER, font="Courier", fill="#dedede", text=g.output())
+# restart
+def restart():
+    g.init()
+    w.itemconfig(screen, text=g.output())
 
 # handle key presses
 def key(event):
@@ -61,15 +33,61 @@ def key(event):
     if press in ('Escape', 'q'):
         root.quit()
 
+
+    ## if victory
+    if g.victory():
+        if press == 'space':
+            g.init()
+
     # update GUI
     w.itemconfig(screen, text=g.output())
 
-    # if victory
-    if g.victory():
-        w.itemconfig(screen, text="Grattis!\n\n[ESC]\tavslutar\n[SPACE]\tbörjar om")
-        if press == 'space':
-            g.init(level)
-            w.itemconfig(screen, text=g.output())
+defaultLevel = """
+ #######
+#       #
+#       #
+# @ o . #
+#       #
+#       #
+ #######
+"""
+
+# check args on commandline
+if len(argv) == 2:
+    try:
+        with open(argv[1]) as f:
+            level = f.read()
+    except:
+        level = defaultLevel
+else:
+    level = defaultLevel
+
+# initialize
+g = Game(level)
+g.init()
+
+# GUI and game loop
+
+root = Tk()
+
+menubar = Menu(root)
+filemenu = Menu(menubar, tearoff=0)
+filemenu.add_command(label="Restart", command=restart)
+filemenu.add_separator()
+filemenu.add_command(label="Open")
+filemenu.add_separator()
+filemenu.add_command(label="Quit Sokoban", command=root.quit)
+menubar.add_cascade(label="File", menu=filemenu)
+helpmenu = Menu(menubar, tearoff=0)
+helpmenu.add_command(label="About")
+menubar.add_cascade(label="Help", menu=helpmenu)
+
+root.title("Sokoban")
+root.config(menu=menubar)
+
+w = Canvas(root, background="#222", width=600, height=500)
+w.pack()
+screen = w.create_text(300,250, anchor=CENTER, font="Courier", fill="#dedede", text=g.output())
 
 # listen for key presses
 root.bind("<Key>", key)

@@ -56,23 +56,23 @@ class Floor(GameObject):
 
 class Game(object):
 
-    def __init__(self):
-        pass
+    def __init__(self, level = ""):
+        self.level = level
 
-    def init(self, s):
-        """Read a level 's' and initialize the game."""
+    def init(self):
+        """Clears the board, reads a new level and initialize the game."""
 
-        # Initialize objects and default values
         self.board = []
         self.player = Player()
         self.crates = {}
         self.levelFinished = False
+        self.numberOfMoves = 0
 
         # Manually track (x,y)-coords and loop through each character
         # and create game objects accordingly
         x = 0
         y = 0
-        for c in s:
+        for c in self.level:
             if c == "@":
                 self.player.coords = (x, y)
                 f = Floor()
@@ -95,10 +95,18 @@ class Game(object):
                 continue
             x += 1
 
+    def changeLevel(self, level):
+        self.level = level
+        self.init()
+
     def victory(self):
         return self.levelFinished
 
     def output(self):
+        """Return a string representation of the board"""
+        if self.levelFinished:
+            return "Congratulations!\n\nYou finished in %d moves." % self.numberOfMoves
+
         # create and return a string representation of the board
         row = 0
         output = ""
@@ -167,6 +175,7 @@ class Game(object):
             # move player
             if movePlayer:
                 self.player.coords = newCoords
+                self.numberOfMoves += 1
 
             # loop and update all floors and storages
             for coords, obj in self.board:
@@ -188,9 +197,6 @@ class Game(object):
                         break
                     else:
                         self.levelFinished = True
-                if self.levelFinished:
-                    #print "HURRA!"
-                    pass
 
         else:
             pass #invalid move

@@ -4,12 +4,20 @@
 # imports
 
 from Tkinter import *
+from tkFileDialog import askopenfilename
 from sokoban_engine import Game
 from sys import argv
 
 # restart
 def restart():
     g.init()
+    w.itemconfig(screen, text=g.output())
+
+# open new level
+def openfile():
+    filename = askopenfilename(parent=root)
+    with open(filename) as f:
+        g.changeLevel(f.read())
     w.itemconfig(screen, text=g.output())
 
 # handle key presses
@@ -32,7 +40,6 @@ def key(event):
     # if exit
     if press in ('Escape', 'q'):
         root.quit()
-
 
     ## if victory
     if g.victory():
@@ -74,7 +81,7 @@ menubar = Menu(root)
 filemenu = Menu(menubar, tearoff=0)
 filemenu.add_command(label="Restart", command=restart)
 filemenu.add_separator()
-filemenu.add_command(label="Open")
+filemenu.add_command(label="Open", command=openfile)
 filemenu.add_separator()
 filemenu.add_command(label="Quit Sokoban", command=root.quit)
 menubar.add_cascade(label="File", menu=filemenu)

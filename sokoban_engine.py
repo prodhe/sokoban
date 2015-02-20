@@ -67,6 +67,7 @@ class Game(object):
         self.crates = {}
         self.levelFinished = False
         self.numberOfMoves = 0
+        self.moveHistory = []
 
         # Manually track (x,y)-coords and loop through each character
         # and create game objects accordingly
@@ -132,6 +133,7 @@ class Game(object):
         # unpack the direction tuple
         try:
             dirX, dirY = direction
+            self.moveHistory.append(direction)
         except:
             return None
 

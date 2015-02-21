@@ -5,7 +5,7 @@
 
 from Tkinter import *
 from tkFileDialog import askopenfilename
-from enginenew import Sokoban, log
+from engine import Sokoban, log
 from sys import argv
 
 # restart

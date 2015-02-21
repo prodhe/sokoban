@@ -11,7 +11,18 @@ class Log(object):
         self.log = []
 
     def __repr__(self):
-        return "\n".join(self.log)
+        return "%s" % (self.log[-1])
+
+    def count(self, count = 0):
+        if count == 0:
+            return "\n".join(self.log)
+        else:
+            start = len(self.log) - count
+            stop = len(self.log)
+            try:
+                return "\n".join(self.log[start:stop])
+            except IndexError:
+                return "\n".join(self.log)
 
     def write(self, msg):
         stack = traceback.extract_stack()

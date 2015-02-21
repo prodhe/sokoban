@@ -1,5 +1,8 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
+#
+#   game.py
+#
+
 
 # imports
 

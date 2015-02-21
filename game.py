@@ -1,32 +1,29 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# do some newstuff
-# and maybe some testing
-
 # imports
 
 from Tkinter import *
 from tkFileDialog import askopenfilename
-from sokoban_engine import Game
+#from sokoban_engine import Game
+from enginenew import Sokoban
 from sys import argv
 
 # restart
 def restart():
-    g.init()
-    w.itemconfig(screen, text=g.output())
+    g.load()
+    w.itemconfig(screen, text=g.show())
 
 # restart
 def undo():
     g.undo()
-    w.itemconfig(screen, text=g.output())
+    w.itemconfig(screen, text=g.show())
 
 # open new level
 def openfile():
     filename = askopenfilename(parent=root)
-    with open(filename) as f:
-        g.changeLevel(f.read())
-    w.itemconfig(screen, text=g.output())
+    g.load(filename)
+    w.itemconfig(screen, text=g.show())
 
 # handle key presses
 def key(event):
@@ -35,7 +32,7 @@ def key(event):
     press = event.keysym
 
     # valid keys if still in game
-    if not g.victory():
+    if not g.finished():
         if press in ('Up','k'):
             g.move((0, -1))
         elif press in ('Down', 'j'):
@@ -52,12 +49,12 @@ def key(event):
         root.quit()
 
     ## if victory
-    if g.victory():
+    if g.finished():
         if press == 'space':
             g.init()
 
     # update GUI
-    w.itemconfig(screen, text=g.output())
+    w.itemconfig(screen, text=g.show())
 
 defaultLevel = """
  #######
@@ -69,19 +66,14 @@ defaultLevel = """
  #######
 """
 
-# check args on commandline
-if len(argv) == 2:
-    try:
-        with open(argv[1]) as f:
-            level = f.read()
-    except:
-        level = defaultLevel
-else:
-    level = defaultLevel
-
 # initialize
-g = Game(level)
-g.init()
+g = Sokoban()
+
+if len(argv) == 2:
+    g.load(argv[2])
+else:
+    g.load()
+
 
 # GUI and game loop
 
@@ -105,7 +97,7 @@ root.config(menu=menubar)
 
 w = Canvas(root, background="#222", width=600, height=500)
 w.pack()
-screen = w.create_text(300,250, anchor=CENTER, font="Courier", fill="#dedede", text=g.output())
+screen = w.create_text(300,250, anchor=CENTER, font="Courier", fill="#dedede", text=g.show())
 
 # listen for key presses
 root.bind("<Key>", key)

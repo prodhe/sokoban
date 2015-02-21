@@ -1,3 +1,9 @@
+#
+#   log.py
+#
+
+import traceback
+
 # log handling
 class Log(object):
 
@@ -8,5 +14,14 @@ class Log(object):
         return "\n".join(self.log)
 
     def write(self, msg):
-        s = "%d: %s" % (len(self.log) + 1, msg)
+        stack = traceback.extract_stack()
+        print "%r" % stack
+        try:
+            call = stack.pop(-3)
+        except IndexError:
+            call = stack.pop(-2)
+        for field in call:
+            print "%r" % (field),
+        print "\n" + "-" * 10
+        s = "%s:%d: in %s : %s: %s" % (call[0], call[1], call[2], call[3], msg)
         self.log.append(s)

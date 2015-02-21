@@ -5,25 +5,24 @@
 
 from Tkinter import *
 from tkFileDialog import askopenfilename
-#from sokoban_engine import Game
-from enginenew import Sokoban
+from enginenew import Sokoban, log
 from sys import argv
 
 # restart
 def restart():
     g.load()
-    w.itemconfig(screen, text=g.show())
+    w.itemconfig(screen, text=g.output())
 
-# restart
+# undo
 def undo():
     g.undo()
-    w.itemconfig(screen, text=g.show())
+    w.itemconfig(screen, text=g.output())
 
 # open new level
 def openfile():
     filename = askopenfilename(parent=root)
     g.load(filename)
-    w.itemconfig(screen, text=g.show())
+    w.itemconfig(screen, text=g.output())
 
 # handle key presses
 def key(event):
@@ -48,23 +47,18 @@ def key(event):
     if press in ('Escape', 'q'):
         root.quit()
 
+    # debug
+    if press in ('D', 'd'):
+        print log
+
     ## if victory
     if g.finished():
         if press == 'space':
-            g.init()
+            g.load()
 
     # update GUI
-    w.itemconfig(screen, text=g.show())
+    w.itemconfig(screen, text=g.output())
 
-defaultLevel = """
- #######
-#       #
-#       #
-# @ o . #
-#       #
-#       #
- #######
-"""
 
 # initialize
 g = Sokoban()
@@ -97,7 +91,7 @@ root.config(menu=menubar)
 
 w = Canvas(root, background="#222", width=600, height=500)
 w.pack()
-screen = w.create_text(300,250, anchor=CENTER, font="Courier", fill="#dedede", text=g.show())
+screen = w.create_text(300,250, anchor=CENTER, font="Courier", fill="#dedede", text=g.output())
 
 # listen for key presses
 root.bind("<Key>", key)
@@ -107,3 +101,6 @@ root.mainloop()
 #root.destroy()
 
 
+#
+# EOF
+#

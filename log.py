@@ -30,5 +30,5 @@ class Log(object):
             call = stack.pop(-3)
         except IndexError:
             call = stack.pop(-2)
-        s = "%s:%d: in %s : %s: %s" % (call[0], call[1], call[2], call[3], msg)
+        s = "%s:%d: in %s : %s:\n    %s" % (call[0], call[1], call[2], call[3], msg)
         self.log.append(s)

@@ -55,7 +55,7 @@ class GameObject(object):
         self.coords = coords
 
     def __repr__(self):
-        return "'%s'" % self.char
+        return "%s:'%s'" % (self.coords, self.char)
 
     def move(newpos):
         if not movable:
@@ -90,21 +90,20 @@ class Wall(GameObject):
 class Level(object):
     """Keeps track of all the objects in a given level"""
 
-    def __init__(self, player):
+    def __init__(self):
         self.board = {}
         self.objects = []
         self.level = ""
-        if isinstance(player, Worker):
-            self.player = player
-        else:
-            return false
+        self.player = Worker()
 
     def loadfile(self, fn):
         try:
             with open(fn) as f:
                 self.level = f.read()
+                log.write("level from %s" % fn)
         except:
             self.level = " ####### \n#       #\n# @ o . #\n#       #\n ####### "
+            log.write("default level")
 
     def loadlevel(self):
         self.objects = []
@@ -115,20 +114,15 @@ class Level(object):
         for c in self.level:
             coords = Coords(x, y)
             if c == "@":
-                #self.add_object(Worker(), coord)
                 self.player.coords = coords
                 self.objects.append(self.player)
             elif c == "o":
-                #self.add_object(Crate(), coord)
                 self.objects.append(Crate(coords = coords))
             elif c == ".":
-                #self.add_object(Storage(), coord)
                 self.objects.append(Storage(coords = coords))
             elif c == "#":
-                #self.add_object(Wall(), coord)
                 self.objects.append(Wall(coords = coords))
             elif c == " ":
-                #self.add_object(Floor(), coord)
                 self.objects.append(Floor(coords = coords))
             elif c == "\n":
                 y += 1
@@ -137,49 +131,17 @@ class Level(object):
             x += 1
         print "%r" % self.objects
 
-    def add_object(self, obj, coord):
-        if isinstance(obj, Worker) or isinstance(obj, Crate):
-            self.board[obj] = []
-            self.board[obj].append(coord)
-        elif obj in self.board:
-            self.board[obj].append(coord)
-        else:
-            self.board[obj] = []
-            self.board[obj].append(coord)
-
-    def get_objects(self, cls, filter_coords = False):
-        result = []
-        for obj, coords in self.board.iteritems():
-            if isinstance(obj, cls):
-                # we didn't send the filter
-                if not filter_coords:
-                    for spot in coords:
-                        result.append((spot, obj))
-                # match only the right objects and the right coords
-                elif filter_coords in coords:
-                    result.append((filter_coords, obj))
-        # switch X,Y to Y,X - sort on that - and then return
-        return sorted(result, key=lambda ((x, y), o): ((y, x), o))
-
-    def update_object(self, obj, delpos, addpos):
-        update = [coords for coords, o in self.get_objects(GameObject) if o == obj]
-        update.remove(delpos)
-        update.append(addpos)
-        self.board[obj] = update
-
 
 class Sokoban(object):
     """Main game logic and API"""
 
     def __init__(self):
-        self.player = Worker()
-        self.level = Level(self.player)
+        self.level = Level()
 
-    def load(self, filename = ""):
+    def start(self, filename = ""):
         if filename:
             self.level.loadfile(filename)
         self.level.loadlevel()
-        log.write("laddat: " + filename)
 
     def move(self, (x, y)):
         dirpos = Coords(x, y)
@@ -216,8 +178,6 @@ class Sokoban(object):
         pass
 
     def output(self):
-        log.write("inne i Game.output")
-        #objects = self.level.get_objects(GameObject)
         objects = self.level.objects
         result = ""
         row = 0
@@ -236,9 +196,10 @@ class Sokoban(object):
 
 game = Sokoban()
 
-game.load("")
+game.start("")
 
 print game.output()
+
 #game.move(Coords(+0, -1))
 #for i in range(10):
 #    print game.show()

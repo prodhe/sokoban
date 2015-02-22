@@ -21,6 +21,33 @@ You must have Python installed, obviously.
 
 ## How to use
 
+Basic movement:
+
+    UP      (k)
+    DOWN    (j)
+    LEFT    (h)
+    RIGHT   (l)
+
+Game control:
+
+    (U)ndo movement
+    (R)edo movement
+    (Esc)ape to quit
+
+Game play:
+
+    @   Worker
+    +
+    o   Crate
+    *
+    .   Storage
+    #   Wall
+
+Move your worker and push the crates, until they are all in storage.
+
+
+## How to code
+
     # import
     import sokoban
     

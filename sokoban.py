@@ -291,7 +291,7 @@ class History(object):
         self.curpos = 0
 
     def count(self):
-        return len(self.timeline)-1
+        return self.curpos-1
 
     def clear(self):
         self.timeline = []
@@ -326,11 +326,13 @@ class Engine(object):
     def __init__(self):
         self.state = State()
         self.history = History()
+        self.level_filename = ""
 
     def load(self, filename = ""):
         """Reads a file and load, otherwise just (re)load our current level"""
         if filename:
             self.state.loadfile(filename)
+            self.level_filename = filename
         self.history.clear()
         self.state.loadlevel()
         self.history.add(self.state)
@@ -354,6 +356,10 @@ class Engine(object):
         del self.state
         self.state = self.history.forward()
 
+    def finished(self):
+        """Returns true if all crates are in storage, a.k.a. game over"""
+        return self.state.finished()
+
     def output(self):
         """Prints an ASCII representation of the current state"""
         if self.state.finished():
@@ -372,9 +378,8 @@ class Engine(object):
                     result += obj.show()
             return result
 
-    def finished(self):
-        """Returns true if all crates are in storage, a.k.a. game over"""
-        return self.state.finished()
+    def output_level_loaded(self):
+        return self.level_filename
 
 def init():
     """Method to activate everyting. Returns an object to work with."""

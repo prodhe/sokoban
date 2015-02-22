@@ -7,10 +7,11 @@
 # imports
 #
 
-from sys import argv
-from tkFileDialog import askopenfilename
+import os
 import Tkinter as tk
 import sokoban
+from sys import argv
+from tkFileDialog import askopenfilename
 
 
 #
@@ -29,24 +30,93 @@ def redo():
     g.redo()
     updategui()
 
-def openfile():
+def openfilegui():
     filename = askopenfilename(parent=root)
     g.load(filename)
     updategui()
 
 def updategui():
-    w.itemconfig(screen, text=g.output())
+    w.itemconfig(screen_game, text=g.output())
+    w.itemconfig(screen_level, text=g.output_level_loaded())
+    w.itemconfig(screen_moves, text="Moves:  %d" % g.history.count())
+
+def get_levels(leveldir):
+    levels = []
+    if os.path.exists(leveldir) and os.path.isdir(leveldir):
+        for filename in os.listdir(leveldir):
+            levels.append(leveldir + os.path.sep + filename)
+    return levels
+
+
+#
+# entry point
+#
+
+# initialize the game engine
+g = sokoban.init()
+
+# load a level
+levels = get_levels("levels")
+current_level = 0
+if levels:
+    g.load(levels[current_level])
+else:
+    g.load()
+
+
+#
+# GUI and game loop
+#
+
+root = tk.Tk()
+root.title("Sokoban")
+
+# menu
+menubar = tk.Menu(root)
+filemenu = tk.Menu(menubar, tearoff=0)
+filemenu.add_command(label="Open level", command=openfilegui)
+filemenu.add_separator()
+filemenu.add_command(label="Undo move", command=undo)
+filemenu.add_command(label="Redo move", command=redo)
+filemenu.add_separator()
+filemenu.add_command(label="Restart level", command=restart)
+filemenu.add_separator()
+filemenu.add_command(label="Quit", command=root.quit)
+menubar.add_cascade(label="Sokoban", menu=filemenu)
+root.config(menu=menubar)
+
+# main screen
+w = tk.Canvas(root, background="#222", width=600, height=500)
+w.pack()
+screen_game = w.create_text(300,250, anchor=tk.CENTER, font="Courier",
+                            fill="#dedede", text=g.output())
+screen_level = w.create_text(10,10, anchor=tk.NW, font="Courier",
+                            fill="#efefef", text=g.output_level_loaded())
+screen_moves = w.create_text(580,10, anchor=tk.NE, font="Courier",
+                             fill="#efefef", text="Moves:  %d" % g.history.count())
 
 # handle key presses
 def key(event):
 
+    # globals for level handling
+    global current_level
+    global levels
+
     # get key
     press = event.keysym
 
-    if press in ('Escape', 'q'):
-        root.quit()
     if press in ('D', 'd'):
         print sokoban.log
+    if press in ('Escape', 'q'):
+        root.quit()
+    if press in ('N', 'n') and levels:
+        if (current_level < len(levels)-1):
+            current_level += 1
+            g.load(levels[current_level])
+    if press in ('P', 'p') and levels:
+        if (current_level > 0):
+            current_level -= 1
+            g.load(levels[current_level])
 
     if not g.finished():
         if press in ('Up','k'):
@@ -66,49 +136,6 @@ def key(event):
             g.load()
 
     updategui()
-
-
-#
-# entry point
-#
-
-# initialize the game engine
-g = sokoban.init()
-
-if len(argv) == 2:
-    g.load(argv[2])
-else:
-    g.load()
-
-
-#
-# GUI and game loop
-#
-
-root = tk.Tk()
-root.title("Sokoban")
-
-# menu
-menubar = tk.Menu(root)
-filemenu = tk.Menu(menubar, tearoff=0)
-filemenu.add_command(label="Open level", command=openfile)
-filemenu.add_separator()
-filemenu.add_command(label="Undo", command=undo)
-filemenu.add_command(label="Redo", command=redo)
-filemenu.add_separator()
-filemenu.add_command(label="Restart", command=restart)
-filemenu.add_separator()
-filemenu.add_command(label="Quit", command=root.quit)
-menubar.add_cascade(label="Sokoban", menu=filemenu)
-#helpmenu = tk.Menu(menubar, tearoff=0)
-#helpmenu.add_command(label="About")
-#menubar.add_cascade(label="Help", menu=helpmenu)
-root.config(menu=menubar)
-
-# main screen
-w = tk.Canvas(root, background="#222", width=600, height=500)
-w.pack()
-screen = w.create_text(300,250, anchor=tk.CENTER, font="Courier", fill="#dedede", text=g.output())
 
 # listen for key presses
 root.bind("<Key>", key)

@@ -37,7 +37,7 @@ def openfilegui():
 
 def updategui():
     w.itemconfig(screen_game, text=g.output())
-    w.itemconfig(screen_level, text=g.output_level_loaded())
+    w.itemconfig(screen_level, text="Loaded: " + g.output_level_loaded())
     w.itemconfig(screen_moves, text="Moves:  %d" % g.history.count())
 
 def get_levels(leveldir):
@@ -91,9 +91,19 @@ w.pack()
 screen_game = w.create_text(300,250, anchor=tk.CENTER, font="Courier",
                             fill="#dedede", text=g.output())
 screen_level = w.create_text(10,10, anchor=tk.NW, font="Courier",
-                            fill="#efefef", text=g.output_level_loaded())
+                             fill="#efefef", text="Loaded: " + g.output_level_loaded())
 screen_moves = w.create_text(580,10, anchor=tk.NE, font="Courier",
                              fill="#efefef", text="Moves:  %d" % g.history.count())
+screen_legend = """
+Keys:
+
+(N)ext
+(P)revious
+
+(U)ndo
+(R)edo
+"""
+w.create_text(10,30, anchor=tk.NW, font="Courier", fill="#efefef", text=screen_legend)
 
 # handle key presses
 def key(event):

@@ -45,6 +45,8 @@ def key(event):
             g.move((1, 0))
         elif press in ('U', 'u'):
             g.undo()
+        elif press in ('R', 'r'):
+            g.redo()
 
     # if exit
     if press in ('Escape', 'q'):

@@ -3,7 +3,12 @@
 #
 
 
-# get log handling
+#####
+#
+# imports
+#
+
+import cPickle
 from log import Log
 log = Log()
 
@@ -294,16 +299,26 @@ class History(object):
 
     def clear(self):
         self.timeline = []
+        self.curpos = 0
     
     def add(self, state):
         del self.timeline[self.curpos:len(self.timeline)]
-        self.timeline.append(state)
-        self.curpos = len(self.timeline)
-        log.write("History.add():\n\t%s\n\t%s" % (self.timeline, self.curpos))
+        self.timeline.append(cPickle.dumps(state))
+        self.curpos += 1
+        log.write("History.add():\n\t%s" % (self.curpos))
 
     def back(self):
-        self.curpos -= 1
-        return self.timeline[self.curpos-1]
+        if self.curpos > 1:
+            self.curpos -= 1
+            log.write("History.back():\n\t%s" % (self.curpos))
+        return cPickle.loads(self.timeline[self.curpos-1])
+
+    def forward(self):
+        if self.curpos < len(self.timeline):
+            self.curpos += 1
+            log.write("History.forward():\n\t%s" % (self.curpos))
+        return cPickle.loads(self.timeline[self.curpos-1])
+
 
 #####
 #
@@ -321,11 +336,13 @@ class Sokoban(object):
         """Reads a file and load, otherwise just (re)load our current level"""
         if filename:
             self.state.loadfile(filename)
-        self.state.loadlevel()
         self.history.clear()
+        self.state.loadlevel()
+        self.history.add(self.state)
 
     def move(self, (x, y)):
-        """Demand a state update with the given direction coordinates"""
+        """Demand a state update with the given direction coordinates
+           and save the new state in history"""
         dirpos = Coords(x, y)
         valid_move = self.state.update(dirpos)
         if valid_move:
@@ -333,7 +350,12 @@ class Sokoban(object):
         return valid_move
 
     def undo(self):
+        del self.state
         self.state = self.history.back()
+
+    def redo(self):
+        del self.state
+        self.state = self.history.forward()
 
     def output(self):
         if self.state.finished():

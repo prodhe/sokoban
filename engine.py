@@ -295,7 +295,7 @@ class History(object):
         self.curpos = 0
 
     def count(self):
-        return len(self.timeline)
+        return len(self.timeline)-1
 
     def clear(self):
         self.timeline = []

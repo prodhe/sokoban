@@ -6,42 +6,40 @@
 
 You must have Python installed, obviously.
 
-1.1) Clone this repository:
+Clone this repository:
 
     git clone https://github.com/prodhe/sokoban.git
 
-1.2) or download it as a zip file:
+Or download it as a zip file:
 
     https://github.com/prodhe/sokoban/archive/master.zip
 
-2) Run
+Run
 
     $ cd sokoban
     $ python rungui.py
 
 ## How to use
 
-Basic movement:
+### Basic movement:
 
     UP      (k)
     DOWN    (j)
     LEFT    (h)
     RIGHT   (l)
 
-Game control:
+### Game control:
 
     (U)ndo movement
     (R)edo movement
     (Esc)ape to quit
 
-Game play:
+### Game play:
 
-    @   Worker
-    +
-    o   Crate
-    *
-    .   Storage
-    #   Wall
+    @ +  Worker
+    o *  Crate
+    .    Storage
+    #    Wall
 
 Move your worker and push the crates, until they are all in storage.
 

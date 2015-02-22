@@ -6,7 +6,7 @@
 
 # imports
 
-from Tkinter import *
+import Tkinter as tk
 from tkFileDialog import askopenfilename
 from engine import Sokoban, log
 from sys import argv
@@ -76,10 +76,10 @@ else:
 
 # GUI and game loop
 
-root = Tk()
+root = tk.Tk()
 
-menubar = Menu(root)
-filemenu = Menu(menubar, tearoff=0)
+menubar = tk.Menu(root)
+filemenu = tk.Menu(menubar, tearoff=0)
 filemenu.add_command(label="Undo", command=undo)
 filemenu.add_command(label="Restart", command=restart)
 filemenu.add_separator()
@@ -87,16 +87,16 @@ filemenu.add_command(label="Open", command=openfile)
 filemenu.add_separator()
 filemenu.add_command(label="Quit Sokoban", command=root.quit)
 menubar.add_cascade(label="File", menu=filemenu)
-helpmenu = Menu(menubar, tearoff=0)
+helpmenu = tk.Menu(menubar, tearoff=0)
 helpmenu.add_command(label="About")
 menubar.add_cascade(label="Help", menu=helpmenu)
 
 root.title("Sokoban")
 root.config(menu=menubar)
 
-w = Canvas(root, background="#222", width=600, height=500)
+w = tk.Canvas(root, background="#222", width=600, height=500)
 w.pack()
-screen = w.create_text(300,250, anchor=CENTER, font="Courier", fill="#dedede", text=g.output())
+screen = w.create_text(300,250, anchor=tk.CENTER, font="Courier", fill="#dedede", text=g.output())
 
 # listen for key presses
 root.bind("<Key>", key)

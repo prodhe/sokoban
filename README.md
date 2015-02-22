@@ -41,6 +41,19 @@ Run
 
 Move your worker and push the crates, until they are all in storage.
 
+Create your own levels in a text editor or pick some from the "levels" subfolder!
+
+        #####
+        #   #
+        #o  #
+      ###  o##
+      #  o o #
+    ### # ## #   ######
+    #   # ## #####  ..#
+    # o  o          ..#
+    ##### ### #@##  ..#
+        #     #########
+        #######
 
 ## How to code
 

@@ -1,5 +1,50 @@
-# Sokoban in Python
+# Sokoban game engine
 
-Just playing around and trying to learn Python.
+...in Python.
 
-Evolves over time...
+## How to run
+
+You must have Python installed, obviously.
+
+1.1) Clone this repository:
+
+    git clone https://github.com/prodhe/sokoban.git
+
+1.2) or download it as a zip file:
+
+    https://github.com/prodhe/sokoban/archive/master.zip
+
+2) Run
+
+    $ cd sokoban
+    $ python rungui.py
+
+## How to use
+
+    # import
+    import sokoban
+    
+    # init
+    g = sokoban.init()
+    
+    # optionally load a level
+    g.load("level.txt")
+    
+    # or load default and also restart
+    g.load()
+    
+    # show ascii output
+    g.output()
+
+    # direction (eg. (-1,0) for left)
+    g.move(x, y)
+
+    # movement history traversal
+    g.undo()
+    g.redo()
+
+    # when finished
+    game.finished() == true
+
+---
+*by Prodhe*

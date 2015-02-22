@@ -9,7 +9,9 @@ log = Log()
 
 
 #####
-
+#
+# Custom types
+#
 
 class Coords(object):
     """Custom class for working with x,y coordinates"""
@@ -44,6 +46,9 @@ class Coords(object):
         else:
             return Coords(self.x * other, self.y * other)
 
+    def __neg__(self):
+        return Coords(self.x * -1, self.y * -1)
+
     def __getitem__(self, key):
         if key == 0:
             return self.x
@@ -65,7 +70,9 @@ class Coords(object):
 
 
 #####
-
+#
+# Main game objects
+#
 
 class GameObject(object):
     """Parent class for all objects in the game"""
@@ -205,7 +212,9 @@ class Wall(GameObject):
 
 
 #####
-
+#
+# State engine to hold the objects and talk to the game API
+#
 
 class State(object):
     """Parse a level in text format into objects for corresponding characters
@@ -214,7 +223,6 @@ class State(object):
     def __init__(self):
         self.objects = []
         self.level = ""
-        self.moves = 0
 
     def loadfile(self, fn):
         """Tries to load <fn> and save as string,
@@ -234,7 +242,6 @@ class State(object):
     def loadlevel(self):
         """Reads the level string into proper game objects"""
         self.objects = []
-        self.moves = 0
         if not self.level:
             self.loadfile("")
         x = 0
@@ -269,40 +276,69 @@ class State(object):
     def update(self, dirpos):
         player = filter(lambda obj: isinstance(obj, Worker), self.objects).pop()
         valid_move = player.move(dirpos, self.objects)
-        if valid_move:
-            self.moves += 1
         return valid_move
 
     def finished(self):
         not_done = [obj for obj in self.objects if isinstance(obj, Crate) and not obj.in_storage]
-        log.write("State.finished():\n\t%r" % not_done)
         return not not_done
 
 
+class History(object):
+
+    def __init__(self):
+        self.timeline = []
+        self.curpos = 0
+
+    def count(self):
+        return len(self.timeline)
+
+    def clear(self):
+        self.timeline = []
+    
+    def add(self, state):
+        del self.timeline[self.curpos:len(self.timeline)]
+        self.timeline.append(state)
+        self.curpos = len(self.timeline)
+        log.write("History.add():\n\t%s\n\t%s" % (self.timeline, self.curpos))
+
+    def back(self):
+        self.curpos -= 1
+        return self.timeline[self.curpos-1]
+
+#####
+#
+# Main class for invoking the game
+#
+
 class Sokoban(object):
-    """Main game logic and API"""
+    """Main API"""
 
     def __init__(self):
         self.state = State()
+        self.history = History()
 
     def load(self, filename = ""):
         """Reads a file and load, otherwise just (re)load our current level"""
         if filename:
             self.state.loadfile(filename)
         self.state.loadlevel()
+        self.history.clear()
 
     def move(self, (x, y)):
         """Demand a state update with the given direction coordinates"""
         dirpos = Coords(x, y)
-        return self.state.update(dirpos)
+        valid_move = self.state.update(dirpos)
+        if valid_move:
+            self.history.add(self.state)
+        return valid_move
 
     def undo(self):
-        pass
+        self.state = self.history.back()
 
     def output(self):
         if self.state.finished():
             result  = "Congratulations!\n\n"
-            result += "You finished in %d moves.\n\n" % self.state.moves
+            result += "You finished in %d moves.\n\n" % self.history.count()
             result += "Press SPACE"
             return result
         else:

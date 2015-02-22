@@ -21,20 +21,18 @@ Run
 
 ## How to use
 
-### Basic movement:
+### Basic movement and game control
 
     UP      (k)
     DOWN    (j)
     LEFT    (h)
     RIGHT   (l)
 
-### Game control:
-
     (U)ndo movement
     (R)edo movement
     (Esc)ape to quit
 
-### Game play:
+### Game play
 
     @ +  Worker
     o *  Crate

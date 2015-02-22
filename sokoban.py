@@ -355,11 +355,10 @@ class Engine(object):
         self.state = self.history.forward()
 
     def output(self):
-        """Prints an ASCII representation of the game"""
+        """Prints an ASCII representation of the current state"""
         if self.state.finished():
             result  = "Congratulations!\n\n"
             result += "You finished in %d moves.\n\n" % self.history.count()
-            result += "- Press SPACE -"
             return result
         else:
             objects = self.state.get()

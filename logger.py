@@ -1,11 +1,11 @@
 #
-#   log.py
+#   logger.py
 #
 
 import traceback
 
 # log handling
-class Log(object):
+class NewLog(object):
 
     def __init__(self):
         self.log = []

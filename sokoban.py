@@ -1,21 +1,19 @@
 #
-#   engine.py
+#   sokoban.py
 #
 
 
-#####
 #
 # imports
 #
 
 import cPickle
-from log import Log
-log = Log()
+import logger
+log = logger.NewLog()
 
 
-#####
 #
-# Custom types
+# Custom type for the coordinate system
 #
 
 class Coords(object):
@@ -74,7 +72,6 @@ class Coords(object):
         return "(%d,%d)" % (self.x, self.y)
 
 
-#####
 #
 # Main game objects
 #
@@ -216,7 +213,6 @@ class Wall(GameObject):
         return False
 
 
-#####
 #
 # State engine to hold the objects and talk to the game API
 #
@@ -235,14 +231,14 @@ class State(object):
         try:
             with open(fn) as f:
                 self.level = f.read()
-                log.write("loaded %s" % fn)
+                log.write("State.loadfile(): loaded %s" % fn)
         except:
             self.level  = " ####### \n"
             self.level += "#       #\n"
             self.level += "# @ o . #\n"
             self.level += "#       #\n"
             self.level += " ####### "
-            log.write("adding default level")
+            log.write("State.loadfile(): no filename - loading default level")
 
     def loadlevel(self):
         """Reads the level string into proper game objects"""
@@ -305,27 +301,26 @@ class History(object):
         del self.timeline[self.curpos:len(self.timeline)]
         self.timeline.append(cPickle.dumps(state))
         self.curpos += 1
-        log.write("History.add():\n\t%s" % (self.curpos))
+        log.write("History.add(): %d" % (self.curpos))
 
     def back(self):
         if self.curpos > 1:
             self.curpos -= 1
-            log.write("History.back():\n\t%s" % (self.curpos))
+            log.write("History.back(): %d" % (self.curpos))
         return cPickle.loads(self.timeline[self.curpos-1])
 
     def forward(self):
         if self.curpos < len(self.timeline):
             self.curpos += 1
-            log.write("History.forward():\n\t%s" % (self.curpos))
+            log.write("History.forward(): %d" % (self.curpos))
         return cPickle.loads(self.timeline[self.curpos-1])
 
 
-#####
 #
 # Main class for invoking the game
 #
 
-class Sokoban(object):
+class Engine(object):
     """Main API"""
 
     def __init__(self):
@@ -340,7 +335,7 @@ class Sokoban(object):
         self.state.loadlevel()
         self.history.add(self.state)
 
-    def move(self, (x, y)):
+    def move(self, x, y):
         """Demand a state update with the given direction coordinates
            and save the new state in history"""
         dirpos = Coords(x, y)
@@ -350,18 +345,21 @@ class Sokoban(object):
         return valid_move
 
     def undo(self):
+        """Traceback one step"""
         del self.state
         self.state = self.history.back()
 
     def redo(self):
+        """Redo as long as you haven't moved since undo"""
         del self.state
         self.state = self.history.forward()
 
     def output(self):
+        """Prints an ASCII representation of the game"""
         if self.state.finished():
             result  = "Congratulations!\n\n"
             result += "You finished in %d moves.\n\n" % self.history.count()
-            result += "Press SPACE"
+            result += "- Press SPACE -"
             return result
         else:
             objects = self.state.get()
@@ -376,8 +374,33 @@ class Sokoban(object):
             return result
 
     def finished(self):
+        """Returns true if all crates are in storage, a.k.a. game over"""
         return self.state.finished()
 
+def init():
+    """Method to activate everyting. Returns an object to work with."""
+    return Engine()
+
+
+#
+# command line
+#
+
+if __name__ == "__main__":
+    print """# Sokoban game engine
+
+import sokoban
+game = sokoban.init()
+game.load()
+game.output()
+game.move(x, y)
+game.undo()
+game.redo()
+if game.finished():
+    print "Game Over!"
+
+# by Prodhe
+"""
 
 #
 # EOF
